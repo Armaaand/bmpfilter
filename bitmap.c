@@ -286,8 +286,14 @@ void applyFilterMirror(BITMAP *bmp)
 
 void applyFilter(BITMAP *bmp, FILTER filter)
 {
-    /* TODO */
-    /* Dispatcher that calls the right method regarding the filter to apply on the bitmap */
+    switch (filter) {
+        case red:
+            break;
+        case green:
+            break;
+        case blue:
+            break;
+    }
 }
 
 FILTER getCorrespondingFilter(const char *filter_name)

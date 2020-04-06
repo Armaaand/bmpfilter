@@ -1,2 +1,9 @@
 #Exclure les fichiers .bmp
 *.bmp
+
+#Exclure les extensions de .vs
+*.json
+*.sqlite
+*.db
+*.ipch
+*.vs
