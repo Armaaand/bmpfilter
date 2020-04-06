@@ -4,6 +4,6 @@
 #Exclure les extensions de .vs
 *.json
 *.sqlite
-*.db
 *.ipch
+*.db
 .vs/
