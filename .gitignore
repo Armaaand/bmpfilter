@@ -6,4 +6,4 @@
 *.sqlite
 *.db
 *.ipch
-*.vs
+.vs/
