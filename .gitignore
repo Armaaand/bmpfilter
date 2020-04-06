@@ -3,7 +3,7 @@
 
 #Exclure les extensions de .vs
 *.json
-*.sqlite
 *.db
 *.ipch
+*.sqlite
 .vs/
