@@ -286,12 +286,32 @@ void applyFilterMirror(BITMAP *bmp)
 
 void applyFilter(BITMAP *bmp, FILTER filter)
 {
+<<<<<<< HEAD
+    switch (filter)
+    {
+        case RED:
+        case GREEN:
+        case BLUE:
+            applyFilterColor(bmp, filter);
+            break;
+
+        case BLUR:
+            applyFilterSimpleBlur(bmp);
+            break;
+
+        case MIRROR:
+            applyFilterMirror(bmp);
+            break;
+
+        case UNKNOWN:
+=======
     switch (filter) {
-        case red:
+        case "red":
             break;
-        case green:
+        case "green":
             break;
-        case blue:
+        case "blue":
+>>>>>>> 8c8eeff98c29d5256abaa6a55fb92ea7461e93ea
             break;
     }
 }
