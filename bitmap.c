@@ -284,6 +284,13 @@ void applyFilterColor(BITMAP *bmp, FILTER filter)
         }
     }
 
+    if (filter == BLUE)
+    {
+        for (i = 0; i < bmp->width * bmp->height; i++)
+        {
+            bmp->raster[i].blue = 0;
+        }
+    }
 }
 
 /*
@@ -292,12 +299,46 @@ void applyFilterColor(BITMAP *bmp, FILTER filter)
 void applyFilterSimpleBlur(BITMAP *bmp)
 {
     int index = 0;
-    /* TODO */
-    /* Considering each color channel of a pixel as the average result of the 9 pixels matrix centered on it */
-    for (index = 0; index < bmp->width * bmp->height; index++)
+
+    for (index = bmp->width + 2; index < (bmp->width * (bmp->height - 1)) - 2; index++)
     {
-        // Code
+        bmp->raster[index].red =
+            (bmp->raster[index].red +
+             bmp->raster[index + 1].red +
+             bmp->raster[index - 1].red +
+             bmp->raster[index + bmp->width].red +
+             bmp->raster[index - bmp->width].red +
+             bmp->raster[index + bmp->width - 1].red +
+             bmp->raster[index - bmp->width - 1].red +
+             bmp->raster[index + bmp->width + 1].red +
+             bmp->raster[index - bmp->width + 1].red) /
+            9;
+
+        bmp->raster[index].green =
+            (bmp->raster[index].green +
+             bmp->raster[index + 1].green +
+             bmp->raster[index - 1].green +
+             bmp->raster[index + bmp->width].green +
+             bmp->raster[index - bmp->width].green +
+             bmp->raster[index + bmp->width - 1].green +
+             bmp->raster[index - bmp->width - 1].green +
+             bmp->raster[index + bmp->width + 1].green +
+             bmp->raster[index - bmp->width + 1].green) /
+            9;
+
+        bmp->raster[index].blue =
+            (bmp->raster[index].blue +
+             bmp->raster[index + 1].blue +
+             bmp->raster[index - 1].blue +
+             bmp->raster[index + bmp->width].blue +
+             bmp->raster[index - bmp->width].blue +
+             bmp->raster[index + bmp->width - 1].blue +
+             bmp->raster[index - bmp->width - 1].blue +
+             bmp->raster[index + bmp->width + 1].blue +
+             bmp->raster[index - bmp->width + 1].blue) /
+            9;
     }
+    printf("Effet blur effectue\n");
 }
 
 /*
@@ -328,10 +369,10 @@ void applyFilter(BITMAP *bmp, FILTER filter)
 
     case UNKNOWN:
         break;
-=======
+        == == == =
 <<<<<<< HEAD
-    switch (filter)
-    {
+                     switch (filter)
+        {
         case RED:
         case GREEN:
         case BLUE:
@@ -347,74 +388,75 @@ void applyFilter(BITMAP *bmp, FILTER filter)
             break;
 
         case UNKNOWN:
-=======
-    switch (filter) {
-        case "red":
-            break;
-        case "green":
-            break;
-        case "blue":
+            == == == =
+                         switch (filter)
+            {
+            case "red":
+                break;
+            case "green":
+                break;
+            case "blue":
 >>>>>>> 8c8eeff98c29d5256abaa6a55fb92ea7461e93ea
-            break;
+                break;
 >>>>>>> 118d2fd2af8454f9c8c7299f6e6f2207ca5095ed
-    }
-}
+            }
+        }
 
-FILTER getCorrespondingFilter(const char *filter_name)
-{
-    if (!filter_name)
-    {
-        return UNKNOWN;
-    }
+        FILTER getCorrespondingFilter(const char *filter_name)
+        {
+            if (!filter_name)
+            {
+                return UNKNOWN;
+            }
 
-    if (!strcmp("red", filter_name))
-    {
-        return RED;
-    }
-    if (!strcmp("green", filter_name))
-    {
-        return GREEN;
-    }
-    if (!strcmp("blur", filter_name))
-    {
-        return BLUR;
-    }
-    if (!strcmp("mirror", filter_name))
-    {
-        return MIRROR;
-    }
+            if (!strcmp("red", filter_name))
+            {
+                return RED;
+            }
+            if (!strcmp("green", filter_name))
+            {
+                return GREEN;
+            }
+            if (!strcmp("blur", filter_name))
+            {
+                return BLUR;
+            }
+            if (!strcmp("mirror", filter_name))
+            {
+                return MIRROR;
+            }
 
-    return UNKNOWN;
-}
+            return UNKNOWN;
+        }
 
-void saveBitmap(BITMAP *bmp)
-{
-    FILE *fp = NULL;
-    int rec;
+        void saveBitmap(BITMAP * bmp)
+        {
+            FILE *fp = NULL;
+            int rec;
 
-    /* Opening the ouput file */
-    if (!bmp || !bmp->file_path || !(fp = fopen(bmp->file_path, "wb")))
-    {
-        return;
-    }
-    /* ------- */
+            /* Opening the ouput file */
+            if (!bmp || !bmp->file_path || !(fp = fopen(bmp->file_path, "wb")))
+            {
+                return;
+            }
+            /* ------- */
 
-    rec = fwrite(bmp->header, 1, bmp->start_offset, fp);
-    if (rec != bmp->start_offset)
-    {
-        fprintf(stderr, "Error: Failed to write\n");
-        goto end;
-    }
-    rec = fwrite((unsigned char *)(bmp->raster), 1, bmp->size - bmp->start_offset, fp);
-    if (rec != bmp->size - bmp->start_offset)
-    {
-        fprintf(stderr, "Error: Failed to write\n");
-        goto end;
-    }
+            rec = fwrite(bmp->header, 1, bmp->start_offset, fp);
+            if (rec != bmp->start_offset)
+            {
+                fprintf(stderr, "Error: Failed to write\n");
+                goto end;
+            }
+            rec = fwrite((unsigned char *)(bmp->raster), 1, bmp->size - bmp->start_offset, fp);
+            if (rec != bmp->size - bmp->start_offset)
+            {
+                fprintf(stderr, "Error: Failed to write\n");
+                goto end;
+            }
 
-end:
-    if (fp)
-    {
-        fclose(fp);
-    }
-}
+        end:
+            if (fp)
+            {
+                fclose(fp);
+            }
+        }
