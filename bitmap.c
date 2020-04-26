@@ -2,14 +2,17 @@
 #include <stdlib.h>
 #define STDLIB_H
 #endif
+
 #ifndef STDIO_H
 #include <stdio.h>
 #define STDIO_H
 #endif
+
 #ifndef STRING_H
 #include <string.h>
 #define STRING_H
 #endif
+
 #ifndef BITMAP_H
 #include "bitmap.h"
 #define BITMAP_H
@@ -244,18 +247,18 @@ void destroyBitmap(BITMAP *bmp)
  * Getting a pixel from the raster using its coordinates following the
  * common logic (The upper-left pixel coordinates are (0, 0))
  */
-PIXEL *getPixel(PIXEL *raster, int width, int height, int y, int x)
+PIXEL *getPixel(PIXEL *raster, int width, int height, int x, int y)
 {
-    /* TODO */
+    return raster;
 }
 
 /*
  * Setting a pixel from the raster using its coordinates following the
  * common logic (The upper-left pixel coordinates are (0, 0))
  */
-void setPixel(PIXEL *raster, int width, int height, int y, int x, PIXEL *value)
+void setPixel(PIXEL *raster, int width, int height, int x, int y, PIXEL *value)
 {
-    /* TODO */
+    (*raster).red = 0;
 }
 
 /*
@@ -263,8 +266,24 @@ void setPixel(PIXEL *raster, int width, int height, int y, int x, PIXEL *value)
  */
 void applyFilterColor(BITMAP *bmp, FILTER filter)
 {
-    /* TODO */
-    /* Zeroing the specified color channel for every pixels */
+    int i = 0;
+
+    if (filter == RED)
+    {
+        for (i = 0; i < bmp->width * bmp->height; i++)
+        {
+            bmp->raster[i].red = 0;
+        }
+    }
+
+    if (filter == GREEN)
+    {
+        for (i = 0; i < bmp->width * bmp->height; i++)
+        {
+            bmp->raster[i].green = 0;
+        }
+    }
+
 }
 
 /*
@@ -272,8 +291,13 @@ void applyFilterColor(BITMAP *bmp, FILTER filter)
  */
 void applyFilterSimpleBlur(BITMAP *bmp)
 {
+    int index = 0;
     /* TODO */
     /* Considering each color channel of a pixel as the average result of the 9 pixels matrix centered on it */
+    for (index = 0; index < bmp->width * bmp->height; index++)
+    {
+        // Code
+    }
 }
 
 /*
@@ -286,6 +310,25 @@ void applyFilterMirror(BITMAP *bmp)
 
 void applyFilter(BITMAP *bmp, FILTER filter)
 {
+<<<<<<< HEAD
+    switch (filter)
+    {
+    case RED:
+    case GREEN:
+        applyFilterColor(bmp, filter);
+        break;
+
+    case BLUR:
+        applyFilterSimpleBlur(bmp);
+        break;
+
+    case MIRROR:
+        applyFilterMirror(bmp);
+        break;
+
+    case UNKNOWN:
+        break;
+=======
 <<<<<<< HEAD
     switch (filter)
     {
@@ -313,6 +356,7 @@ void applyFilter(BITMAP *bmp, FILTER filter)
         case "blue":
 >>>>>>> 8c8eeff98c29d5256abaa6a55fb92ea7461e93ea
             break;
+>>>>>>> 118d2fd2af8454f9c8c7299f6e6f2207ca5095ed
     }
 }
 
@@ -330,10 +374,6 @@ FILTER getCorrespondingFilter(const char *filter_name)
     if (!strcmp("green", filter_name))
     {
         return GREEN;
-    }
-    if (!strcmp("blue", filter_name))
-    {
-        return BLUE;
     }
     if (!strcmp("blur", filter_name))
     {
