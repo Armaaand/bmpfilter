@@ -7,7 +7,11 @@
 #define LIMITS_H
 #endif
 
+<<<<<<< HEAD
 // Structure pixel : rouge, bleu, vert
+=======
+// Structure pixel
+>>>>>>> 8c8eeff98c29d5256abaa6a55fb92ea7461e93ea
 typedef struct _pixel
 {
     unsigned char blue;
