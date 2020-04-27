@@ -18,445 +18,428 @@
 #define BITMAP_H
 #endif
 
-BITMAP *loadBitmap(const char *file_path)
+#include <math.h>
+
+BITMAP* loadBitmap(const char* file_path)
 {
-    FILE *fp = NULL;
-    BITMAP *bmp = NULL;
-    int ret, variableLength;
+	FILE* fp = NULL;
+	BITMAP* bmp = NULL;
+	int ret, variableLength;
 
-    /* Opening the input file */
-    if (!file_path || !(fp = fopen(file_path, "rb")))
-    {
-        return NULL;
-    }
-    /* ------- */
+	/* Opening the input file */
+	if (!file_path || !(fp = fopen(file_path, "rb")))
+	{
+		return NULL;
+	}
+	/* ------- */
 
-    /* Creating and feeding the storage structure */
-    if (!(bmp = malloc(sizeof(BITMAP))))
-    {
-        fprintf(stderr, "Error: Failed to allocate memory\n");
-        if (fp)
-        {
-            fclose(fp);
-        }
-        return NULL;
-    }
-    memset(bmp, 0x00, sizeof(BITMAP));
+	/* Creating and feeding the storage structure */
+	if (!(bmp = malloc(sizeof(BITMAP))))
+	{
+		fprintf(stderr, "Error: Failed to allocate memory\n");
+		if (fp)
+		{
+			fclose(fp);
+		}
+		return NULL;
+	}
+	memset(bmp, 0x00, sizeof(BITMAP));
 
-    ret = fread(&(bmp->magic_number), 1, 2, fp);
-    if (2 != ret)
-    {
-        fprintf(stderr, "Error: Failed to read\n");
-        destroyBitmap(bmp);
-        if (fp)
-        {
-            fclose(fp);
-        }
-        return NULL;
-    }
-    ret = fread(&(bmp->size), 4, 1, fp);
-    if (1 != ret)
-    {
-        fprintf(stderr, "Error: Failed to read\n");
-        destroyBitmap(bmp);
-        if (fp)
-        {
-            fclose(fp);
-        }
-        return NULL;
-    }
-    ret = fread(&(bmp->application), 1, 4, fp);
-    if (4 != ret)
-    {
-        fprintf(stderr, "Error: Failed to read\n");
-        destroyBitmap(bmp);
-        if (fp)
-        {
-            fclose(fp);
-        }
-        return NULL;
-    }
-    ret = fread(&(bmp->start_offset), 4, 1, fp);
-    if (1 != ret)
-    {
-        fprintf(stderr, "Error: Failed to read\n");
-        destroyBitmap(bmp);
-        if (fp)
-        {
-            fclose(fp);
-        }
-        return NULL;
-    }
+	ret = fread(&(bmp->magic_number), 1, 2, fp);
+	if (2 != ret)
+	{
+		fprintf(stderr, "Error: Failed to read\n");
+		destroyBitmap(bmp);
+		if (fp)
+		{
+			fclose(fp);
+		}
+		return NULL;
+	}
+	ret = fread(&(bmp->size), 4, 1, fp);
+	if (1 != ret)
+	{
+		fprintf(stderr, "Error: Failed to read\n");
+		destroyBitmap(bmp);
+		if (fp)
+		{
+			fclose(fp);
+		}
+		return NULL;
+	}
+	ret = fread(&(bmp->application), 1, 4, fp);
+	if (4 != ret)
+	{
+		fprintf(stderr, "Error: Failed to read\n");
+		destroyBitmap(bmp);
+		if (fp)
+		{
+			fclose(fp);
+		}
+		return NULL;
+	}
+	ret = fread(&(bmp->start_offset), 4, 1, fp);
+	if (1 != ret)
+	{
+		fprintf(stderr, "Error: Failed to read\n");
+		destroyBitmap(bmp);
+		if (fp)
+		{
+			fclose(fp);
+		}
+		return NULL;
+	}
 
-    ret = fread(&(bmp->bitmap_header_size), 4, 1, fp);
-    if (1 != ret)
-    {
-        fprintf(stderr, "Error: Failed to read\n");
-        destroyBitmap(bmp);
-        if (fp)
-        {
-            fclose(fp);
-        }
-        return NULL;
-    }
-    if (bmp->bitmap_header_size <= 12)
-    {
-        variableLength = 2;
-    }
-    else
-    {
-        variableLength = 4;
-    }
-    ret = fread(&(bmp->width), variableLength, 1, fp);
-    if (1 != ret)
-    {
-        fprintf(stderr, "Error: Failed to read\n");
-        destroyBitmap(bmp);
-        if (fp)
-        {
-            fclose(fp);
-        }
-        return NULL;
-    }
-    ret = fread(&(bmp->height), variableLength, 1, fp);
-    if (1 != ret)
-    {
-        fprintf(stderr, "Error: Failed to read\n");
-        destroyBitmap(bmp);
-        if (fp)
-        {
-            fclose(fp);
-        }
-        return NULL;
-    }
-    fseek(fp, 2, SEEK_CUR);
-    ret = fread(&(bmp->depth), 2, 1, fp);
-    if (1 != ret)
-    {
-        fprintf(stderr, "Error: Failed to read\n");
-        destroyBitmap(bmp);
-        if (fp)
-        {
-            fclose(fp);
-        }
-        return NULL;
-    }
-    /* ------- */
+	ret = fread(&(bmp->bitmap_header_size), 4, 1, fp);
+	if (1 != ret)
+	{
+		fprintf(stderr, "Error: Failed to read\n");
+		destroyBitmap(bmp);
+		if (fp)
+		{
+			fclose(fp);
+		}
+		return NULL;
+	}
+	if (bmp->bitmap_header_size <= 12)
+	{
+		variableLength = 2;
+	}
+	else
+	{
+		variableLength = 4;
+	}
+	ret = fread(&(bmp->width), variableLength, 1, fp);
+	if (1 != ret)
+	{
+		fprintf(stderr, "Error: Failed to read\n");
+		destroyBitmap(bmp);
+		if (fp)
+		{
+			fclose(fp);
+		}
+		return NULL;
+	}
+	ret = fread(&(bmp->height), variableLength, 1, fp);
+	if (1 != ret)
+	{
+		fprintf(stderr, "Error: Failed to read\n");
+		destroyBitmap(bmp);
+		if (fp)
+		{
+			fclose(fp);
+		}
+		return NULL;
+	}
+	fseek(fp, 2, SEEK_CUR);
+	ret = fread(&(bmp->depth), 2, 1, fp);
+	if (1 != ret)
+	{
+		fprintf(stderr, "Error: Failed to read\n");
+		destroyBitmap(bmp);
+		if (fp)
+		{
+			fclose(fp);
+		}
+		return NULL;
+	}
+	/* ------- */
 
-    /* Storing the header */
-    rewind(fp);
-    if (!(bmp->header = malloc(bmp->start_offset)))
-    {
-        fprintf(stderr, "Error: Failed to allocate memory\n");
-        destroyBitmap(bmp);
-        if (fp)
-        {
-            fclose(fp);
-        }
-        return NULL;
-    }
-    ret = fread(bmp->header, 1, bmp->start_offset, fp);
-    if (ret != bmp->start_offset)
-    {
-        fprintf(stderr, "Error: Failed to read\n");
-        destroyBitmap(bmp);
-        if (fp)
-        {
-            fclose(fp);
-        }
-        return NULL;
-    }
-    /* ------- */
+	/* Storing the header */
+	rewind(fp);
+	if (!(bmp->header = malloc(bmp->start_offset)))
+	{
+		fprintf(stderr, "Error: Failed to allocate memory\n");
+		destroyBitmap(bmp);
+		if (fp)
+		{
+			fclose(fp);
+		}
+		return NULL;
+	}
+	ret = fread(bmp->header, 1, bmp->start_offset, fp);
+	if (ret != bmp->start_offset)
+	{
+		fprintf(stderr, "Error: Failed to read\n");
+		destroyBitmap(bmp);
+		if (fp)
+		{
+			fclose(fp);
+		}
+		return NULL;
+	}
+	/* ------- */
 
-    /* Storing the pixels into the raster */
-    if (!(bmp->raster = malloc(bmp->size - bmp->start_offset)))
-    {
-        fprintf(stderr, "Error: Failed to allocate memory\n");
-        destroyBitmap(bmp);
-        if (fp)
-        {
-            fclose(fp);
-        }
-        return NULL;
-    }
-    ret = fread(bmp->raster, 1, bmp->size - bmp->start_offset, fp);
-    if (ret != bmp->size - bmp->start_offset)
-    {
-        fprintf(stderr, "Error: Failed to read\n");
-        destroyBitmap(bmp);
-        if (fp)
-        {
-            fclose(fp);
-        }
-        return NULL;
-    }
-    /* ------- */
+	/* Storing the pixels into the raster */
+	if (!(bmp->raster = malloc(bmp->size - bmp->start_offset)))
+	{
+		fprintf(stderr, "Error: Failed to allocate memory\n");
+		destroyBitmap(bmp);
+		if (fp)
+		{
+			fclose(fp);
+		}
+		return NULL;
+	}
+	ret = fread(bmp->raster, 1, bmp->size - bmp->start_offset, fp);
+	if (ret != bmp->size - bmp->start_offset)
+	{
+		fprintf(stderr, "Error: Failed to read\n");
+		destroyBitmap(bmp);
+		if (fp)
+		{
+			fclose(fp);
+		}
+		return NULL;
+	}
+	/* ------- */
 
-    /* Saving the name of the file (and adding the "_mod" suffix) */
-    strncpy(bmp->file_path, file_path, strlen(file_path));
-    strncat(bmp->file_path, "_mod", 4);
-    /* ------- */
+	/* Saving the name of the file (and adding the "_mod" suffix) */
+	strncpy(bmp->file_path, file_path, strlen(file_path));
+	strncat(bmp->file_path, "_mod", 4);
+	/* ------- */
 
-    /* Allowed bitmap test (24bpp color depth only) */
-    if (!allowedBitmapFormat(bmp))
-    {
-        fprintf(stderr, "Error: Bitmap format not allowed (only 24 bpp)\n");
-        destroyBitmap(bmp);
-        if (fp)
-        {
-            fclose(fp);
-        }
-        return NULL;
-    }
-    /* ------- */
+	/* Allowed bitmap test (24bpp color depth only) */
+	if (!allowedBitmapFormat(bmp))
+	{
+		fprintf(stderr, "Error: Bitmap format not allowed (only 24 bpp)\n");
+		destroyBitmap(bmp);
+		if (fp)
+		{
+			fclose(fp);
+		}
+		return NULL;
+	}
+	/* ------- */
 
-    if (fp)
-    {
-        fclose(fp);
-    }
-    return bmp;
+	if (fp)
+	{
+		fclose(fp);
+	}
+	return bmp;
 }
 
-bool allowedBitmapFormat(BITMAP *bmp)
+bool allowedBitmapFormat(BITMAP* bmp)
 {
-    if (!bmp || strncmp(bmp->magic_number, "BM", 2))
-    {
-        return false;
-    }
+	if (!bmp || strncmp(bmp->magic_number, "BM", 2))
+	{
+		return false;
+	}
 
-    return (24 == bmp->depth) ? true : false;
+	return (24 == bmp->depth) ? true : false;
 }
 
-void destroyBitmap(BITMAP *bmp)
+void destroyBitmap(BITMAP* bmp)
 {
-    if (bmp)
-    {
-        if (bmp->header)
-        {
-            free(bmp->header);
-        }
-        if (bmp->raster)
-        {
-            free(bmp->raster);
-        }
-        free(bmp);
-    }
+	if (bmp)
+	{
+		if (bmp->header)
+		{
+			free(bmp->header);
+		}
+		if (bmp->raster)
+		{
+			free(bmp->raster);
+		}
+		free(bmp);
+	}
 }
 
 /*
  * Getting a pixel from the raster using its coordinates following the
  * common logic (The upper-left pixel coordinates are (0, 0))
  */
-PIXEL *getPixel(PIXEL *raster, int width, int height, int x, int y)
+PIXEL* getPixel(PIXEL* raster, int width, int height, int x, int y)
 {
-    return raster;
+	return raster;
 }
 
 /*
  * Setting a pixel from the raster using its coordinates following the
  * common logic (The upper-left pixel coordinates are (0, 0))
  */
-void setPixel(PIXEL *raster, int width, int height, int x, int y, PIXEL *value)
+void setPixel(PIXEL* raster, int width, int height, int x, int y, PIXEL* value)
 {
-    (*raster).red = 0;
+	(*raster).red = 0;
 }
 
 /*
  * Cutting one color channel for every pixels in the content of the raster
  */
-void applyFilterColor(BITMAP *bmp, FILTER filter)
+void applyFilterColor(BITMAP* bmp, FILTER filter)
 {
-    int i = 0;
+	int i = 0;
 
-    if (filter == RED)
-    {
-        for (i = 0; i < bmp->width * bmp->height; i++)
-        {
-            bmp->raster[i].red = 0;
-        }
-    }
+	if (filter == RED)
+	{
+		for (i = 0; i < bmp->width * bmp->height; i++)
+		{
+			bmp->raster[i].red = 0;
+		}
+	}
 
-    if (filter == GREEN)
-    {
-        for (i = 0; i < bmp->width * bmp->height; i++)
-        {
-            bmp->raster[i].green = 0;
-        }
-    }
+	if (filter == GREEN)
+	{
+		for (i = 0; i < bmp->width * bmp->height; i++)
+		{
+			bmp->raster[i].green = 0;
+		}
+	}
 
-    if (filter == BLUE)
-    {
-        for (i = 0; i < bmp->width * bmp->height; i++)
-        {
-            bmp->raster[i].blue = 0;
-        }
-    }
+	if (filter == BLUE)
+	{
+		for (i = 0; i < bmp->width * bmp->height; i++)
+		{
+			bmp->raster[i].blue = 0;
+		}
+	}
 }
 
 /*
  * Applying a simple blur effect to the picture
  */
-void applyFilterSimpleBlur(BITMAP *bmp)
+void applyFilterSimpleBlur(BITMAP* bmp)
 {
-    int index = 0;
+	int index = 0;
 
-    for (index = bmp->width + 2; index < (bmp->width * (bmp->height - 1)) - 2; index++)
-    {
-        bmp->raster[index].red =
-            (bmp->raster[index].red +
-             bmp->raster[index + 1].red +
-             bmp->raster[index - 1].red +
-             bmp->raster[index + bmp->width].red +
-             bmp->raster[index - bmp->width].red +
-             bmp->raster[index + bmp->width - 1].red +
-             bmp->raster[index - bmp->width - 1].red +
-             bmp->raster[index + bmp->width + 1].red +
-             bmp->raster[index - bmp->width + 1].red) /
-            9;
+	for (index = bmp->width + 2; index < (bmp->width * (bmp->height - 1)) - 2; index++)
+	{
+		bmp->raster[index].red =
+			(bmp->raster[index].red +
+				bmp->raster[index + 1].red +
+				bmp->raster[index - 1].red +
+				bmp->raster[index + bmp->width].red +
+				bmp->raster[index - bmp->width].red +
+				bmp->raster[index + bmp->width - 1].red +
+				bmp->raster[index - bmp->width - 1].red +
+				bmp->raster[index + bmp->width + 1].red +
+				bmp->raster[index - bmp->width + 1].red) /
+			9;
 
-        bmp->raster[index].green =
-            (bmp->raster[index].green +
-             bmp->raster[index + 1].green +
-             bmp->raster[index - 1].green +
-             bmp->raster[index + bmp->width].green +
-             bmp->raster[index - bmp->width].green +
-             bmp->raster[index + bmp->width - 1].green +
-             bmp->raster[index - bmp->width - 1].green +
-             bmp->raster[index + bmp->width + 1].green +
-             bmp->raster[index - bmp->width + 1].green) /
-            9;
+		bmp->raster[index].green =
+			(bmp->raster[index].green +
+				bmp->raster[index + 1].green +
+				bmp->raster[index - 1].green +
+				bmp->raster[index + bmp->width].green +
+				bmp->raster[index - bmp->width].green +
+				bmp->raster[index + bmp->width - 1].green +
+				bmp->raster[index - bmp->width - 1].green +
+				bmp->raster[index + bmp->width + 1].green +
+				bmp->raster[index - bmp->width + 1].green) /
+			9;
 
-        bmp->raster[index].blue =
-            (bmp->raster[index].blue +
-             bmp->raster[index + 1].blue +
-             bmp->raster[index - 1].blue +
-             bmp->raster[index + bmp->width].blue +
-             bmp->raster[index - bmp->width].blue +
-             bmp->raster[index + bmp->width - 1].blue +
-             bmp->raster[index - bmp->width - 1].blue +
-             bmp->raster[index + bmp->width + 1].blue +
-             bmp->raster[index - bmp->width + 1].blue) /
-            9;
-    }
-    printf("Effet blur effectue\n");
+		bmp->raster[index].blue =
+			(bmp->raster[index].blue +
+				bmp->raster[index + 1].blue +
+				bmp->raster[index - 1].blue +
+				bmp->raster[index + bmp->width].blue +
+				bmp->raster[index - bmp->width].blue +
+				bmp->raster[index + bmp->width - 1].blue +
+				bmp->raster[index - bmp->width - 1].blue +
+				bmp->raster[index + bmp->width + 1].blue +
+				bmp->raster[index - bmp->width + 1].blue) /
+			9;
+	}
+	printf("Effet blur effectue\n");
 }
 
 /*
  * Applying a mirror effect to the content of the raster
  */
-void applyFilterMirror(BITMAP *bmp)
+void applyFilterMirror(BITMAP* bmp)
 {
-    /* TODO */
+	int i = 0, j = 0;
+
+	for (i = 0; i < bmp->height; i++)
+	{
+		for (j = 0; j < floor(bmp->width / 2); j++)
+		{
+			PIXEL temp = bmp->raster[(i * bmp->width) + j];
+			bmp->raster[(i * bmp->width) + j] = bmp->raster[((i + 1) * bmp->width) - j];
+			bmp->raster[((i + 1) * bmp->width) - j] = temp;
+		}
+	}
 }
 
-void applyFilter(BITMAP *bmp, FILTER filter)
+void applyFilter(BITMAP* bmp, FILTER filter)
 {
-<<<<<<< HEAD
-    switch (filter)
-    {
-    case RED:
-    case GREEN:
-        applyFilterColor(bmp, filter);
-        break;
+	switch (filter)
+	{
+		case BLUE:
+		case RED:
+		case GREEN:
+			applyFilterColor(bmp, filter);
+			break;
 
-    case BLUR:
-        applyFilterSimpleBlur(bmp);
-        break;
+		case BLUR:
+			applyFilterSimpleBlur(bmp);
+			break;
 
-    case MIRROR:
-        applyFilterMirror(bmp);
-        break;
+		case MIRROR:
+			applyFilterMirror(bmp);
+			break;
 
-    case UNKNOWN:
-        break;
-        == == == =
-<<<<<<< HEAD
-                     switch (filter)
-        {
-        case RED:
-        case GREEN:
-        case BLUE:
-            applyFilterColor(bmp, filter);
-            break;
+		case UNKNOWN:
+			break;
+	}
+}
 
-        case BLUR:
-            applyFilterSimpleBlur(bmp);
-            break;
 
-        case MIRROR:
-            applyFilterMirror(bmp);
-            break;
+FILTER getCorrespondingFilter(const char* filter_name)
+{
+	if (!filter_name)
+	{
+		return UNKNOWN;
+	}
 
-        case UNKNOWN:
-            == == == =
-                         switch (filter)
-            {
-            case "red":
-                break;
-            case "green":
-                break;
-            case "blue":
->>>>>>> 8c8eeff98c29d5256abaa6a55fb92ea7461e93ea
-                break;
->>>>>>> 118d2fd2af8454f9c8c7299f6e6f2207ca5095ed
-            }
-        }
+	if (!strcmp("red", filter_name))
+	{
+		return RED;
+	}
+	if (!strcmp("green", filter_name))
+	{
+		return GREEN;
+	}
+	if (!strcmp("blur", filter_name))
+	{
+		return BLUR;
+	}
+	if (!strcmp("mirror", filter_name))
+	{
+		return MIRROR;
+	}
 
-        FILTER getCorrespondingFilter(const char *filter_name)
-        {
-            if (!filter_name)
-            {
-                return UNKNOWN;
-            }
+	return UNKNOWN;
+}
 
-            if (!strcmp("red", filter_name))
-            {
-                return RED;
-            }
-            if (!strcmp("green", filter_name))
-            {
-                return GREEN;
-            }
-            if (!strcmp("blur", filter_name))
-            {
-                return BLUR;
-            }
-            if (!strcmp("mirror", filter_name))
-            {
-                return MIRROR;
-            }
+void saveBitmap(BITMAP* bmp)
+{
+	FILE* fp = NULL;
+	int rec;
 
-            return UNKNOWN;
-        }
+	/* Opening the ouput file */
+	if (!bmp || !bmp->file_path || !(fp = fopen(bmp->file_path, "wb")))
+	{
+		return;
+	}
+	/* ------- */
 
-        void saveBitmap(BITMAP * bmp)
-        {
-            FILE *fp = NULL;
-            int rec;
+	rec = fwrite(bmp->header, 1, bmp->start_offset, fp);
+	if (rec != bmp->start_offset)
+	{
+		fprintf(stderr, "Error: Failed to write\n");
+		goto end;
+	}
+	rec = fwrite((unsigned char*)(bmp->raster), 1, bmp->size - bmp->start_offset, fp);
+	if (rec != bmp->size - bmp->start_offset)
+	{
+		fprintf(stderr, "Error: Failed to write\n");
+		goto end;
+	}
 
-            /* Opening the ouput file */
-            if (!bmp || !bmp->file_path || !(fp = fopen(bmp->file_path, "wb")))
-            {
-                return;
-            }
-            /* ------- */
-
-            rec = fwrite(bmp->header, 1, bmp->start_offset, fp);
-            if (rec != bmp->start_offset)
-            {
-                fprintf(stderr, "Error: Failed to write\n");
-                goto end;
-            }
-            rec = fwrite((unsigned char *)(bmp->raster), 1, bmp->size - bmp->start_offset, fp);
-            if (rec != bmp->size - bmp->start_offset)
-            {
-                fprintf(stderr, "Error: Failed to write\n");
-                goto end;
-            }
-
-        end:
-            if (fp)
-            {
-                fclose(fp);
-            }
-        }
+end:
+	if (fp)
+	{
+		fclose(fp);
+	}
+}
